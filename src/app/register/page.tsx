@@ -82,7 +82,7 @@ export default function RegisterPage() {
           <div>
             <label className="text-black">Nama lengkap</label>
             <input
-              type="text"
+              type="Nama"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
