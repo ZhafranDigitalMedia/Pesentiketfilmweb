@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import logo from "../../assets/logo.png";
 
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../utils/firebase";
 
@@ -16,17 +16,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // ✅ AUTO REDIRECT SAAT AUTH SUDAH VALID
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.push("/");
-      }
-    });
-
-    return () => unsub();
-  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,10 +44,11 @@ export default function LoginPage() {
 
       // 3️⃣ SIMPAN LOCALSTORAGE
       localStorage.setItem("uid", user.uid);
-      localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", userData.role ?? "user");
+      localStorage.setItem("user", JSON.stringify(userData));
 
-      // ❌ JANGAN router.push DI SINI
+      // 4️⃣ REDIRECT SETELAH SEMUA SIAP
+      router.replace("/");
 
     } catch (err: any) {
       if (err.code === "auth/user-not-found") {
@@ -78,41 +68,29 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
       <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-xl">
-
-        {/* Logo */}
         <div className="flex flex-col items-center mb-6">
           <img src={logo.src} className="w-12 mb-2" alt="logo" />
           <h1 className="text-3xl font-bold text-indigo-600">CineBook</h1>
         </div>
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <div>
-            <label className="text-black">Email</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
 
-          <div className="relative">
-            <label className="text-black">Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 cursor-pointer"
-            >
-              {showPassword ? "🙈" : "👁️"}
-            </span>
-          </div>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
 
           {error && <p className="text-red-600 text-center">{error}</p>}
 

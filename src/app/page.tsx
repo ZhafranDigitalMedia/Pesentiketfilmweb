@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
 
@@ -13,26 +14,24 @@ import AddCinema from "../components/addCinema";
 import Footer from "../components/Footer";
 
 export default function HomePage() {
+  const router = useRouter(); // ✅ WAJIB
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        window.location.href = "/login";
+        router.replace("/login"); // ✅ sekarang aman
         return;
       }
 
-      // ambil role dari Firestore
-      const snap = await fetch(`/api/user-role?uid=${user.uid}`);
-      const data = await snap.json();
-
-      setRole(data.role ?? "user");
+      const role = localStorage.getItem("role") ?? "user";
+      setRole(role);
       setLoading(false);
     });
 
     return () => unsub();
-  }, []);
+  }, [router]);
 
   if (loading) {
     return (
