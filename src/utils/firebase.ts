@@ -1,19 +1,18 @@
-import { initializeApp, getApps } from "firebase/app";
+// utils/firebase.ts
+import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC7UHMwil0M4QwWWLEGE-XvKINrx7u0zIc",
-  authDomain: "cinebook-befa2.firebaseapp.com",
-  projectId: "cinebook-befa2",
-  storageBucket: "cinebook-befa2.firebasestorage.app",
-  messagingSenderId: "725090839686",
-  appId: "1:725090839686:web:a4c207f78937fd15737507",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
 };
 
-const app = !getApps().length
-  ? initializeApp(firebaseConfig)
-  : getApps()[0];
+const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);

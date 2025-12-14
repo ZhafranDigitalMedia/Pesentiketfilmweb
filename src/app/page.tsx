@@ -14,14 +14,14 @@ import AddCinema from "../components/addCinema";
 import Footer from "../components/Footer";
 
 export default function HomePage() {
-  const router = useRouter(); // ✅ WAJIB
+  const router = useRouter(); // ✅ INI WAJIB
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        router.replace("/login"); // ✅ sekarang aman
+        router.replace("/login");
         return;
       }
 
