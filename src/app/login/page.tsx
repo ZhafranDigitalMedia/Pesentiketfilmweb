@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import logo from "../../assets/logo.png";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../utils/firebase";
 
@@ -17,13 +17,24 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // ✅ AUTO REDIRECT SAAT AUTH SUDAH VALID
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
+
+    return () => unsub();
+  }, [router]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      // 1️⃣ LOGIN FIREBASE AUTH
+      // 1️⃣ LOGIN AUTH
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -32,23 +43,22 @@ export default function LoginPage() {
 
       const user = userCredential.user;
 
-      // 2️⃣ AMBIL DATA USER DARI FIRESTORE
+      // 2️⃣ AMBIL USER FIRESTORE
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
       if (!userSnap.exists()) {
-        throw new Error("Data user tidak ditemukan di database");
+        throw new Error("Data user tidak ditemukan");
       }
 
       const userData = userSnap.data();
 
-      // 3️⃣ SIMPAN KE LOCALSTORAGE (OPTIONAL)
+      // 3️⃣ SIMPAN LOCALSTORAGE
       localStorage.setItem("uid", user.uid);
       localStorage.setItem("user", JSON.stringify(userData));
       localStorage.setItem("role", userData.role ?? "user");
 
-      // 4️⃣ REDIRECT
-      router.push("/");
+      // ❌ JANGAN router.push DI SINI
 
     } catch (err: any) {
       if (err.code === "auth/user-not-found") {
@@ -75,15 +85,12 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-indigo-600">CineBook</h1>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
-
           <div>
             <label className="text-black">Email</label>
             <input
               type="email"
               required
-              placeholder="email@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
@@ -95,37 +102,28 @@ export default function LoginPage() {
             <input
               type={showPassword ? "text" : "password"}
               required
-              placeholder="******"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
             />
-
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 cursor-pointer text-gray-600"
+              className="absolute right-3 top-10 cursor-pointer"
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
 
-          {error && <p className="text-red-600 text-center text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-center">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg font-semibold"
+            className="bg-indigo-500 text-white py-2 rounded-lg font-semibold"
           >
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
-
-        <p className="text-center mt-4 text-sm">
-          Belum punya akun?{" "}
-          <a href="/register" className="font-semibold text-indigo-600">
-            Register
-          </a>
-        </p>
       </div>
     </div>
   );

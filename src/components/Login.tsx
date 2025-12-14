@@ -1,128 +1,130 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import logo from "../../assets/logo.png";
 
-const Login: React.FC = () => {
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../utils/firebase";
+
+export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 TAMBAHAN
+  const [loading, setLoading] = useState(false);
+
+  // ✅ AUTO REDIRECT SAAT AUTH SUDAH VALID
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
+
+    return () => unsub();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
-      const url = `http://localhost:8080/tess/login?email=${encodeURIComponent(
-        email
-      )}&password=${encodeURIComponent(password)}`;
+      // 1️⃣ LOGIN AUTH
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-      const response = await fetch(url, {
-        method: "POST",
-      });
+      const user = userCredential.user;
 
-      if (!response.ok) {
-        throw new Error("Login gagal, cek email atau password.");
+      // 2️⃣ AMBIL USER FIRESTORE
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        throw new Error("Data user tidak ditemukan");
       }
 
-      const data = await response.json();
-      console.log("Login success:", data);
+      const userData = userSnap.data();
 
-      localStorage.setItem("userId", data.id);
-      localStorage.setItem("user", JSON.stringify(data));
+      // 3️⃣ SIMPAN LOCALSTORAGE
+      localStorage.setItem("uid", user.uid);
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("role", userData.role ?? "user");
 
-      alert("Login berhasil!");
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Terjadi kesalahan saat login."
-      );
+      // ❌ JANGAN router.push DI SINI
+
+    } catch (err: any) {
+      if (err.code === "auth/user-not-found") {
+        setError("Email belum terdaftar");
+      } else if (err.code === "auth/wrong-password") {
+        setError("Password salah");
+      } else if (err.code === "auth/invalid-credential") {
+        setError("Email atau password salah");
+      } else {
+        setError("Login gagal");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-400 to-purple-600">
-      <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
+      <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-xl">
 
-        {/* LOGO */}
-        <div className="text-center mb-6">
-          <Image
-            src="/logo.svg"
-            alt="CineBook"
-            width={48}
-            height={48}
-            className="mx-auto mb-2"
-            priority
-          />
-          <h1 className="text-3xl font-semibold text-blue-700">CineBook</h1>
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-6">
+          <img src={logo.src} className="w-12 mb-2" alt="logo" />
+          <h1 className="text-3xl font-bold text-indigo-600">CineBook</h1>
         </div>
 
-        {/* FORM LOGIN */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          
-          {/* EMAIL */}
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="block font-medium mb-1">Email</label>
+            <label className="text-black">Email</label>
             <input
               type="email"
-              placeholder="email@example.com"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-400 outline-none"
-              required
+              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
             />
           </div>
 
-          {/* PASSWORD */}
           <div className="relative">
-            <label className="block font-medium mb-1">Password</label>
-
+            <label className="text-black">Password</label>
             <input
-              type={showPassword ? "text" : "password"} // 👈 TOGGLE
-              placeholder="••••••••"
+              type={showPassword ? "text" : "password"}
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border rounded-lg p-2 pr-10 focus:ring-2 focus:ring-blue-400 outline-none"
-              required
+              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
             />
-
-            {/* ICON EYE */}
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 cursor-pointer text-gray-600"
+              className="absolute right-3 top-10 cursor-pointer"
             >
-              {showPassword ? "👁️" : "🙈"}
+              {showPassword ? "🙈" : "👁️"}
             </span>
           </div>
 
-          {/* ERROR */}
-          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+          {error && <p className="text-red-600 text-center">{error}</p>}
 
-          {/* BUTTON LOGIN */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+            className="bg-indigo-500 text-white py-2 rounded-lg font-semibold"
           >
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
-
-        <p className="text-center mt-4 text-sm">
-          Belum punya akun? <a className="font-bold cursor-pointer">Register</a>
-        </p>
-
-        <p className="text-xs text-center text-gray-600 mt-6">
-          💡 Tip: Gunakan email dengan kata admin untuk akses admin panel
-        </p>
-
       </div>
     </div>
   );
-};
-
-export default Login;
+}
