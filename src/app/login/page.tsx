@@ -19,7 +19,7 @@ export default function LoginPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
-        router.replace("/");
+        router.replace("/profile");
       }
     });
     return () => unsub();
