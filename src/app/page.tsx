@@ -18,20 +18,21 @@ export default function HomePage() {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.replace("/login");
-        return;
-      }
+ useEffect(() => {
+  const unsub = onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
-      const role = localStorage.getItem("role") ?? "user";
-      setRole(role);
-      setLoading(false);
-    });
+    const role = localStorage.getItem("role") ?? "user";
+    setRole(role);
+    setLoading(false);
+  });
 
-    return () => unsub();
-  }, [router]);
+  return () => unsub();
+}, []);
+
 
   if (loading) {
     return (

@@ -1,21 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import logo from "../../assets/logo.png";
-
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../utils/firebase";
+import logo from "../../assets/logo.png";
 
 export default function LoginPage() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // 🔑 AUTO REDIRECT JIKA SUDAH LOGIN
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.replace("/");
+      }
+    });
+    return () => unsub();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +31,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ LOGIN AUTH
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
@@ -32,7 +39,6 @@ export default function LoginPage() {
 
       const user = userCredential.user;
 
-      // 2️⃣ AMBIL USER FIRESTORE
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
@@ -42,24 +48,12 @@ export default function LoginPage() {
 
       const userData = userSnap.data();
 
-      // 3️⃣ SIMPAN LOCALSTORAGE
-      localStorage.setItem("uid", user.uid);
       localStorage.setItem("role", userData.role ?? "user");
       localStorage.setItem("user", JSON.stringify(userData));
-
-      // 4️⃣ REDIRECT SETELAH SEMUA SIAP
-      router.replace("/");
+      // ❌ JANGAN router.replace di sini
 
     } catch (err: any) {
-      if (err.code === "auth/user-not-found") {
-        setError("Email belum terdaftar");
-      } else if (err.code === "auth/wrong-password") {
-        setError("Password salah");
-      } else if (err.code === "auth/invalid-credential") {
-        setError("Email atau password salah");
-      } else {
-        setError("Login gagal");
-      }
+      setError("Email atau password salah");
     } finally {
       setLoading(false);
     }
@@ -84,7 +78,7 @@ export default function LoginPage() {
           />
 
           <input
-            type={showPassword ? "text" : "password"}
+            type="password"
             placeholder="Password"
             required
             value={password}
