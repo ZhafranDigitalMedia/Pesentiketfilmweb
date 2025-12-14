@@ -96,6 +96,12 @@ export default function LoginPage() {
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
+         <p className="text-center mt-4 text-sm">
+          Belum punya akun?{" "}
+          <a href="/register" className="font-semibold text-indigo-600">
+            Register
+          </a>
+        </p>
       </div>
     </div>
   );
