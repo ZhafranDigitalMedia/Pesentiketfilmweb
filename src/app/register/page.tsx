@@ -83,6 +83,7 @@ export default function RegisterPage() {
             <label className="text-black">Nama lengkap</label>
             <input
               type="Nama"
+              placeholder="Nama Lengkap"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -93,7 +94,8 @@ export default function RegisterPage() {
           <div>
             <label className="text-black">Email</label>
             <input
-              type="email"
+              type="Email"
+              placeholder="Email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -105,6 +107,7 @@ export default function RegisterPage() {
             <label className="text-black">Password</label>
             <input
               type={showPassword ? "text" : "password"}
+              placeholder="Password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -116,6 +119,7 @@ export default function RegisterPage() {
             <label className="text-black">Konfirmasi Password</label>
             <input
               type={showPassword ? "text" : "password"}
+              placeholder="Konfirmasi Password"
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -123,7 +127,7 @@ export default function RegisterPage() {
             />
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-[35px] cursor-pointer text-gray-600 text-lg"
+              className="absolute right-3 top-8.75 cursor-pointer text-gray-600 text-lg"
             >
               {showPassword ? "🙈" : "👁️"}
             </span>
@@ -133,6 +137,7 @@ export default function RegisterPage() {
             <label className="text-black">No Telepon</label>
             <input
               type="text"
+              placeholder="No Telepon"
               required
               value={notelp}
               onChange={(e) => setNotelp(e.target.value)}
