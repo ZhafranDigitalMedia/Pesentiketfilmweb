@@ -62,38 +62,15 @@ export default function HistoryPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-      }}
-    >
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: "28px",
-          padding: "40px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-        }}
-      >
+    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-10">
+      <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-5xl mx-auto">
         {/* TITLE */}
-        <h2
-          style={{
-            fontSize: "30px",
-            fontWeight: 700,
-            marginBottom: "30px",
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            color: "#222",
-          }}
-        >
+        <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-6 text-gray-800">
           🎫 Riwayat Tiket
         </h2>
 
         {tickets.length === 0 && (
-          <p style={{ textAlign: "center", color: "#777" }}>
+          <p className="text-center text-gray-500">
             🎟️ Belum ada riwayat pembelian
           </p>
         )}
@@ -101,70 +78,53 @@ export default function HistoryPage() {
         {tickets.map((t) => (
           <div
             key={t.id}
-            style={{
-              background: "#f9fafb",
-              borderRadius: "22px",
-              padding: "30px",
-              marginBottom: "25px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.06)",
-            }}
+            className="bg-gray-50 rounded-2xl shadow-md p-4 sm:p-6 mb-5
+                     flex flex-col lg:flex-row lg:items-center gap-6"
           >
             {/* LEFT */}
-            <div style={{ flex: 1 }}>
-              <h3 style={{ margin: 0, fontSize: "22px", fontWeight: 700, color: "#222" }}>
+            <div className="flex-1">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-800">
                 {t.filmTitle}
               </h3>
 
-              <div style={{ marginTop: "18px", color: "#444" }}>
-                <p><strong>Cinema:</strong><br />{t.cinemaName}</p>
-                <p><strong>Waktu:</strong><br />{t.schedule}</p>
+              <div className="mt-3 text-sm sm:text-base text-gray-600 space-y-2">
+                <p>
+                  <span className="font-semibold">Cinema:</span><br />
+                  {t.cinemaName}
+                </p>
+                <p>
+                  <span className="font-semibold">Waktu:</span><br />
+                  {t.schedule}
+                </p>
               </div>
             </div>
 
             {/* MIDDLE */}
-            <div style={{ flex: 0.6, color: "#444" }}>
-              <p><strong>Kursi:</strong><br />{t.seat}</p>
+            <div className="text-sm sm:text-base text-gray-600">
               <p>
-                <strong>Harga:</strong><br />
+                <span className="font-semibold">Kursi:</span><br />
+                {t.seat}
+              </p>
+              <p className="mt-2">
+                <span className="font-semibold">Harga:</span><br />
                 Rp {t.price.toLocaleString("id-ID")}
               </p>
             </div>
 
             {/* RIGHT */}
-            <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  color: "green",
-                  fontWeight: 600,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  justifyContent: "flex-end",
-                  marginBottom: "14px",
-                }}
-              >
+            <div className="flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4">
+              <div className="text-green-600 font-semibold flex items-center gap-1">
                 ✅ Paid
               </div>
 
               <div
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  borderRadius: "18px",
-                  background: "linear-gradient(145deg, #6f7cf7, #8b5cf6)",
-                  color: "#fff",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl
+                         bg-gradient-to-br from-indigo-500 to-purple-500
+                         text-white flex flex-col items-center justify-center
+                         cursor-pointer"
               >
-                <div style={{ fontSize: "42px", marginBottom: "6px" }}>▣</div>
-                <span style={{ fontSize: "13px" }}>QR CODE</span>
+                <div className="text-3xl mb-1">▣</div>
+                <span className="text-xs">QR CODE</span>
               </div>
             </div>
           </div>
@@ -172,4 +132,5 @@ export default function HistoryPage() {
       </div>
     </div>
   );
+
 }

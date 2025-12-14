@@ -81,113 +81,87 @@ export default function Tiket() {
   // UI
   // ======================
   return (
-    <div style={{ minHeight: "100vh", padding: "30px" }}>
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: "28px",
-          padding: "40px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.08)",
-        }}
-      >
+    <div className="min-h-screen p-4 sm:p-8 bg-[#6A77E0]">
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-10 max-w-6xl mx-auto shadow-xl">
+
         {/* TITLE */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            marginBottom: "40px",
-          }}
-        >
-          <span style={{ fontSize: "28px" }}>📜</span>
-          <h2
-            style={{
-              fontSize: "28px",
-              fontWeight: 700,
-              margin: 0,
-              color: "#333",
-            }}
-          >
+        <div className="flex items-center gap-3 mb-8">
+          <span className="text-2xl">📜</span>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
             Tiket Sales
           </h2>
         </div>
 
         {/* EMPTY */}
         {tickets.length === 0 && (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#777" }}>
-            <p style={{ fontSize: "18px" }}>🎟️ Belum ada tiket</p>
-          </div>
+          <p className="text-center text-gray-500 py-16">
+            🎟️ Belum ada tiket
+          </p>
         )}
 
         {/* LIST */}
-        {tickets.map((ticket) => (
-          <div
-            key={ticket.id}
-            style={{
-              background: "#f7f8fc",
-              padding: "35px",
-              borderRadius: "20px",
-              marginBottom: "25px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              gap: "20px",
-              boxShadow: "0 5px 18px rgba(0,0,0,0.05)",
-            }}
-          >
-            {/* LEFT */}
-            <div style={{ flex: 1, minWidth: 0, color: "#333" }}>
-              <h2 style={{ marginBottom: 10 }}>{ticket.filmTitle}</h2>
-
-              <p><strong>Cinema:</strong> {ticket.cinemaName}</p>
-              <p><strong>Waktu:</strong> {ticket.schedule}</p>
-              <p>
-                <strong>Nama Pembeli:</strong> {ticket.name}
-              </p>
-            </div>
-
-            {/* RIGHT */}
-            <div style={{ flex: 0.6, minWidth: 0, color: "#333" }}>
-              <p><strong>Kursi:</strong> {ticket.seat}</p>
-              <p>
-                <strong>Harga:</strong>{" "}
-                Rp {ticket.price.toLocaleString("id-ID")}
-              </p>
-              <p>
-                <strong>Order:</strong>{" "}
-                {ticket.orderDate
-                  ? ticket.orderDate.toDate().toLocaleString("id-ID")
-                  : "-"}
-              </p>
-
-              <p style={{ marginTop: 10, color: "green", fontWeight: 600 }}>
-                ✔ Paid
-              </p>
-            </div>
-
-            {/* QR */}
+        <div className="space-y-6">
+          {tickets.map((ticket) => (
             <div
-                style={{
-                  width: "120px",
-                  height: "120px",
-                  borderRadius: "18px",
-                  background: "linear-gradient(145deg, #6f7cf7, #8b5cf6)",
-                  color: "#fff",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                }}
-              >
-                <div style={{ fontSize: "42px", marginBottom: "6px" }}>▣</div>
-                <span style={{ fontSize: "13px" }}>QR CODE</span>
+              key={ticket.id}
+              className="
+              bg-gray-50 rounded-2xl p-5 sm:p-8
+              shadow-md
+              flex flex-col lg:flex-row
+              gap-6
+            "
+            >
+              {/* LEFT */}
+              <div className="flex-1 text-gray-800">
+                <h3 className="text-xl font-semibold mb-2">
+                  {ticket.filmTitle}
+                </h3>
+
+                <p><strong>Cinema:</strong> {ticket.cinemaName}</p>
+                <p><strong>Waktu:</strong> {ticket.schedule}</p>
+                <p><strong>Nama Pembeli:</strong> {ticket.name}</p>
               </div>
-          </div>
-        ))}
+
+              {/* MIDDLE */}
+              <div className="flex-1 text-gray-800">
+                <p><strong>Kursi:</strong> {ticket.seat}</p>
+                <p>
+                  <strong>Harga:</strong>{" "}
+                  Rp {ticket.price.toLocaleString("id-ID")}
+                </p>
+                <p>
+                  <strong>Order:</strong>{" "}
+                  {ticket.orderDate
+                    ? ticket.orderDate.toDate().toLocaleString("id-ID")
+                    : "-"}
+                </p>
+
+                <p className="mt-2 text-green-600 font-semibold">
+                  ✔ Paid
+                </p>
+              </div>
+
+              {/* QR */}
+              <div className="flex justify-center lg:justify-end">
+                <div
+                  className="
+                  w-28 h-28 sm:w-32 sm:h-32
+                  rounded-xl
+                  bg-gradient-to-br from-indigo-500 to-purple-500
+                  text-white
+                  flex flex-col items-center justify-center
+                  cursor-pointer
+                "
+                >
+                  <div className="text-3xl mb-1">▣</div>
+                  <span className="text-xs">QR CODE</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
+
 }

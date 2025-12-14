@@ -27,7 +27,7 @@ export default function AddCinema() {
         createdAt: serverTimestamp(),
       });
 
-      router.push("/"); // atau /admin/cinema
+      router.push("/");
     } catch (err) {
       console.error(err);
       setError("Gagal menambahkan cinema");
@@ -37,65 +37,69 @@ export default function AddCinema() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br p-6 flex justify-center">
-      <div className="bg-white w-full max-w-4xl p-12 rounded-3xl shadow-xl">
+    <div className="min-h-screen flex justify-center items-start bg-gradient-to-br p-4 sm:p-8">
+      <div className="bg-white w-full max-w-xl rounded-2xl shadow-xl p-6 sm:p-10">
 
-        <h1 className="text-3xl font-bold text-indigo-600 mb-10 text-center">
-          Add Cinema
+        <h1 className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-6 text-center">
+          🎬 Add Cinema
         </h1>
 
-        <div className="bg-gray-50 p-10 rounded-2xl shadow-md">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Nama Cinema */}
-            <div>
-              <label className="text-black font-semibold">Nama Cinema</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full mt-1 px-4 py-3 border rounded-lg text-black"
-              />
-            </div>
+          {/* Nama Cinema */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Nama Cinema
+            </label>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
 
-            {/* Location */}
-            <div>
-              <label className="text-black font-semibold">Location</label>
-              <input
-                type="text"
-                required
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full mt-1 px-4 py-3 border rounded-lg text-black"
-              />
-            </div>
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Location
+            </label>
+            <input
+              type="text"
+              required
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full px-4 py-2.5 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
 
-            {/* Price */}
-            <div>
-              <label className="text-black font-semibold">Price</label>
-              <input
-                type="number"
-                required
-                value={price}
-                onChange={(e) => setPrice(Number(e.target.value))}
-                className="w-full mt-1 px-4 py-3 border rounded-lg text-black"
-              />
-            </div>
+          {/* Price */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Price (Rp)
+            </label>
+            <input
+              type="number"
+              required
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              className="w-full px-4 py-2.5 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            />
+          </div>
 
-            {error && (
-              <p className="text-red-600 text-center text-sm">{error}</p>
-            )}
+          {error && (
+            <p className="text-red-600 text-sm text-center">{error}</p>
+          )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-lg font-semibold"
-            >
-              {loading ? "Loading..." : "Add Cinema"}
-            </button>
-          </form>
-        </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 rounded-xl font-semibold transition"
+          >
+            {loading ? "Saving..." : "Add Cinema"}
+          </button>
+        </form>
       </div>
     </div>
   );

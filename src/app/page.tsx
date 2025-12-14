@@ -15,7 +15,6 @@ import Footer from "../components/Footer";
 
 export default function HomePage() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<"admin" | "user">("user");
 
@@ -26,7 +25,6 @@ export default function HomePage() {
         return;
       }
 
-      // 🔥 ambil role SETELAH user valid
       const savedRole =
         (localStorage.getItem("role") as "admin" | "user") ?? "user";
 
@@ -39,24 +37,32 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex justify-center items-center text-white text-2xl">
+      <div className="min-h-screen flex justify-center items-center text-white text-xl sm:text-2xl">
         Loading...
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundColor: "#6A77E0", minHeight: "100vh" }}>
-      <header className="flex justify-center items-center gap-3 p-4">
-        <Image src={logo} alt="CineBook logo" width={100} height={100} />
-        <h1 className="text-4xl font-bold text-white">CineBook</h1>
+    <div className="min-h-screen bg-[#6A77E0] flex flex-col">
+      <header className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3 p-4">
+        <Image
+          src={logo}
+          alt="CineBook logo"
+          width={70}
+          height={70}
+          className="sm:w-[100px] sm:h-[100px]"
+        />
+        <h1 className="text-2xl sm:text-4xl font-bold text-white">
+          CineBook
+        </h1>
       </header>
 
       {role === "admin" ? <AdminHeaderNav /> : <HeaderNav />}
 
-      <div className="p-8">
+      <main className="flex-1 px-4 sm:px-8 py-6">
         {role === "admin" ? <AddCinema /> : <MovieGrid />}
-      </div>
+      </main>
 
       <Footer />
     </div>

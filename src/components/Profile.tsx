@@ -74,90 +74,54 @@ export default function Profile() {
   }
 
   return (
-    <div style={{ background: "#6A77E0", minHeight: "100vh", padding: "30px" }}>
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: "28px",
-          padding: "40px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-          boxShadow: "0 18px 40px rgba(0,0,0,0.08)",
-        }}
-      >
+    <div className="min-h-screen bg-[#6A77E0] px-4 py-6 sm:py-10">
+      <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-4xl mx-auto shadow-xl">
         {/* TITLE */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40 }}>
-          <span style={{ fontSize: 28 }}>👤</span>
-          <h2 style={{ fontSize: 28, fontWeight: 700, margin: 0,color: "#333" }}>Profile</h2>
+        <div className="flex items-center gap-3 mb-8">
+          <span className="text-2xl">👤</span>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Profile
+          </h2>
         </div>
 
         {/* PROFILE CARD */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #6C7AE0, #7E5EBE)",
-            borderRadius: "24px",
-            padding: "30px",
-            color: "#fff",
-            textAlign: "center",
-            maxWidth: "420px",
-            margin: "0 auto 30px",
-          }}
-        >
-          <div
-            style={{
-              width: 90,
-              height: 90,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 40,
-              margin: "0 auto 16px",
-            }}
-          >
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-500
+                      rounded-3xl p-6 sm:p-8 text-white text-center
+                      max-w-md mx-auto mb-8">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full
+                        bg-white/30 flex items-center justify-center
+                        text-3xl sm:text-4xl mx-auto mb-4">
             👤
           </div>
 
-          <h3 style={{ marginBottom: 6 }}>{user.name}</h3>
-          <p>✉️ {user.email}</p>
-          <p>📞 {user.no_telp}</p>
-          <p>Role : {user.role}</p>
+          <h3 className="text-lg sm:text-xl font-semibold">
+            {user.name}
+          </h3>
+          <p className="text-sm sm:text-base mt-1">✉️ {user.email}</p>
+          <p className="text-sm sm:text-base">📞 {user.no_telp}</p>
+          <p className="text-sm sm:text-base mt-2">
+            Role: <span className="font-semibold capitalize">{user.role}</span>
+          </p>
         </div>
 
         {/* STATS */}
         {user.role !== "admin" && (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 20,
-              maxWidth: 520,
-              margin: "0 auto 30px",
-            }}
-          >
+          <div className="grid grid-cols-2 gap-4 max-w-md mx-auto mb-8">
             <StatCard icon="🎟️" value={totalTicket} label="Tiket Dibeli" />
             <StatCard icon="❤️" value={totalFavorite} label="Film Favorit" />
           </div>
         )}
 
         {/* LOGOUT */}
-        <div style={{ maxWidth: 520, margin: "0 auto" }}>
+        <div className="max-w-md mx-auto">
           <button
             onClick={async () => {
               await signOut(auth);
               router.replace("/login");
             }}
-            style={{
-              width: "100%",
-              padding: 14,
-              borderRadius: 14,
-              border: "none",
-              background: "#F56C6C",
-              color: "#fff",
-              fontWeight: 600,
-              cursor: "pointer",
-            }}
+            className="w-full py-3 rounded-xl bg-red-500
+                     text-white font-semibold hover:bg-red-600
+                     transition"
           >
             Logout
           </button>
@@ -165,6 +129,7 @@ export default function Profile() {
       </div>
     </div>
   );
+
 }
 
 // =========================
@@ -180,17 +145,10 @@ function StatCard({
   label: string;
 }) {
   return (
-    <div
-      style={{
-        background: "#f9f9f9",
-        borderRadius: 18,
-        padding: 20,
-        textAlign: "center",
-      }}
-    >
-      <div style={{ fontSize: 24 }}>{icon}</div>
-      <div style={{ fontSize: 22, fontWeight: 600,color: "#333" }}>{value}</div>
-      <div style={{ fontSize: 14, color: "#777" }}>{label}</div>
+    <div className="bg-gray-50 rounded-2xl p-4 text-center shadow-sm">
+      <div className="text-2xl mb-1">{icon}</div>
+      <div className="text-xl font-bold text-gray-800">{value}</div>
+      <div className="text-sm text-gray-500">{label}</div>
     </div>
   );
 }
