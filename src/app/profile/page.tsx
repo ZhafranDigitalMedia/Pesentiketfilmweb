@@ -6,6 +6,7 @@ import logo from "../../assets/cinebook-logo.png";
 import HeaderNav from "../../components/HeaderNav";
 import AdminHeaderNav from "../../components/adminHeaderNav";
 import Profile from "../../components/Profile";
+import Footer from "../../components/Footer";
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -75,6 +76,8 @@ export default function ProfilePage() {
 
       {/* PROFILE CONTENT */}
       <Profile />
+      <Footer />
     </div>
   );
+
 }
