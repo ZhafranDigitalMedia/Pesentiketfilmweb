@@ -39,9 +39,27 @@ export default function PrivacyPolicypage() {
     }, []);
 
     if (loading) return null;
+    const sectionTitle = {
+        fontSize: "24px",
+        fontWeight: 700,
+        marginBottom: "16px",
+    };
+
+    const subTitle = {
+        fontSize: "18px",
+        fontWeight: 600,
+        marginTop: "20px",
+    };
+
+    const listStyle = {
+        paddingLeft: "20px",
+        marginTop: "10px",
+    };
+
 
     return (
         <div style={{ background: "#6A77E0", minHeight: "100vh" }}>
+            
             {/* HEADER */}
             <header
                 style={{
@@ -64,104 +82,146 @@ export default function PrivacyPolicypage() {
             {/* CONTENT */}
             <main
                 style={{
-                    maxWidth: "1000px",
-                    margin: "40px auto",
+                    maxWidth: "960px",
+                    margin: "50px auto",
                     background: "white",
-                    color: "#222",
-                    padding: "40px",
-                    borderRadius: "12px",
-                    lineHeight: 1.7,
+                    color: "#1f2937",
+                    padding: "50px",
+                    borderRadius: "16px",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+                    lineHeight: 1.8,
+                    fontSize: "15px",
                 }}
             >
-                <h1>Privacy Policy</h1>
-                <p>Last updated: December 19, 2025</p>
+                {/* TITLE */}
+                <div style={{ marginBottom: "30px" }}>
+                    <h1 style={{ fontSize: "36px", fontWeight: 800, marginBottom: "10px" }}>
+                        Privacy Policy
+                    </h1>
+                    <p style={{ color: "#6b7280" }}>
+                        Last updated: December 19, 2025
+                    </p>
+                </div>
 
-                <p>
-                    This Privacy Policy describes Our policies and procedures on the collection,
-                    use and disclosure of Your information when You use the Service and tells You
-                    about Your privacy rights and how the law protects You.
-                </p>
+                <section>
+                    <p>
+                        This Privacy Policy describes Our policies and procedures on the
+                        collection, use, and disclosure of Your information when You use the
+                        Service and tells You about Your privacy rights and how the law
+                        protects You.
+                    </p>
 
-                <p>
-                    We use Your Personal data to provide and improve the Service. By using the
-                    Service, You agree to the collection and use of information in accordance with
-                    this Privacy Policy. This Privacy Policy has been created with the help of the{" "}
-                    <a href="https://www.termsfeed.com/privacy-policy-generator/" target="_blank">
-                        Privacy Policy Generator
-                    </a>.
-                </p>
-
-                <h2>Interpretation and Definitions</h2>
-                <h3>Interpretation</h3>
-                <p>
-                    The words whose initial letters are capitalized have meanings defined under
-                    the following conditions.
-                </p>
-
-                <h3>Definitions</h3>
-                <ul>
-                    <li><strong>Account</strong> means a unique account created for You.</li>
-                    <li><strong>Affiliate</strong> means an entity under common control.</li>
-                    <li><strong>Company</strong> refers to CineBook.</li>
-                    <li><strong>Cookies</strong> are small files placed on Your device.</li>
-                    <li><strong>Country</strong> refers to Indonesia.</li>
-                    <li><strong>Device</strong> means any device that can access the Service.</li>
-                    <li><strong>Personal Data</strong> is any identifiable information.</li>
-                    <li><strong>Service</strong> refers to the Website.</li>
-                    <li><strong>Usage Data</strong> refers to data collected automatically.</li>
-                    <li>
-                        <strong>Website</strong> refers to CineBook, accessible from{" "}
+                    <p>
+                        By using the Service, You agree to the collection and use of
+                        information in accordance with this Privacy Policy. This document was
+                        generated with the help of the{" "}
                         <a
-                            href="https://pesentiketfilmweb-3lcl.vercel.app/"
+                            href="https://www.termsfeed.com/privacy-policy-generator/"
                             target="_blank"
-                            rel="noopener noreferrer"
+                            style={{ color: "#4f46e5", fontWeight: 600 }}
                         >
-                            https://pesentiketfilmweb-3lcl.vercel.app/
-                        </a>
-                    </li>
-                </ul>
+                            Privacy Policy Generator
+                        </a>.
+                    </p>
+                </section>
 
-                <h2>Collecting and Using Your Personal Data</h2>
-                <h3>Personal Data</h3>
-                <ul>
-                    <li>Email address</li>
-                    <li>First name and last name</li>
-                    <li>Phone number</li>
-                    <li>Usage Data</li>
-                </ul>
+                <hr style={{ margin: "40px 0" }} />
 
-                <h3>Tracking Technologies and Cookies</h3>
-                <p>
-                    We use Cookies and similar tracking technologies to track activity and
-                    improve the Service.
-                </p>
+                <section>
+                    <h2 style={sectionTitle}>Interpretation & Definitions</h2>
 
-                <h3>Use of Your Personal Data</h3>
-                <ul>
-                    <li>To provide and maintain the Service</li>
-                    <li>To manage Your Account</li>
-                    <li>To contact You</li>
-                    <li>For business transfers</li>
-                </ul>
+                    <h3 style={subTitle}>Interpretation</h3>
+                    <p>
+                        Words with capitalized initial letters have meanings defined under
+                        the following conditions.
+                    </p>
 
-                <h3>Security of Your Personal Data</h3>
-                <p>
-                    While We strive to protect Your data, no method of transmission is 100% secure.
-                </p>
+                    <h3 style={subTitle}>Definitions</h3>
+                    <ul style={listStyle}>
+                        <li><strong>Account</strong> – A unique account created for You.</li>
+                        <li><strong>Affiliate</strong> – An entity under common control.</li>
+                        <li><strong>Company</strong> – CineBook.</li>
+                        <li><strong>Cookies</strong> – Small files stored on Your device.</li>
+                        <li><strong>Country</strong> – Indonesia.</li>
+                        <li><strong>Device</strong> – Any device accessing the Service.</li>
+                        <li><strong>Personal Data</strong> – Identifiable information.</li>
+                        <li><strong>Usage Data</strong> – Data collected automatically.</li>
+                    </ul>
+                </section>
 
-                <h2>Children's Privacy</h2>
-                <p>
-                    Our Service does not address anyone under the age of 13.
-                </p>
+                <hr style={{ margin: "40px 0" }} />
 
-                <h2>Changes to this Privacy Policy</h2>
-                <p>
-                    We may update this Privacy Policy from time to time.
-                </p>
+                <section>
+                    <h2 style={sectionTitle}>Collecting and Using Your Personal Data</h2>
 
-                <h2>Contact Us</h2>
-                <p>Email: digitalmedia875@gmail.com</p>
+                    <h3 style={subTitle}>Personal Data</h3>
+                    <ul style={listStyle}>
+                        <li>Email address</li>
+                        <li>First name and last name</li>
+                        <li>Phone number</li>
+                        <li>Usage Data</li>
+                    </ul>
+
+                    <h3 style={subTitle}>Tracking Technologies & Cookies</h3>
+                    <p>
+                        We use Cookies and similar technologies to track activity and improve
+                        user experience.
+                    </p>
+                </section>
+
+                <hr style={{ margin: "40px 0" }} />
+
+                <section>
+                    <h2 style={sectionTitle}>Use of Your Personal Data</h2>
+                    <ul style={listStyle}>
+                        <li>To provide and maintain the Service</li>
+                        <li>To manage Your account</li>
+                        <li>To contact You</li>
+                        <li>For business transfers</li>
+                    </ul>
+                </section>
+
+                <hr style={{ margin: "40px 0" }} />
+
+                <section>
+                    <h2 style={sectionTitle}>Security</h2>
+                    <p>
+                        We take reasonable measures to protect Your data, but no system is
+                        100% secure.
+                    </p>
+                </section>
+
+                <hr style={{ margin: "40px 0" }} />
+
+                <section>
+                    <h2 style={sectionTitle}>Children’s Privacy</h2>
+                    <p>
+                        Our Service does not address anyone under the age of 13.
+                    </p>
+                </section>
+
+                <hr style={{ margin: "40px 0" }} />
+
+                <section>
+                    <h2 style={sectionTitle}>Changes to This Policy</h2>
+                    <p>
+                        We may update this Privacy Policy from time to time. Updates will be
+                        posted on this page.
+                    </p>
+                </section>
+
+                <hr style={{ margin: "40px 0" }} />
+
+                <section>
+                    <h2 style={sectionTitle}>Contact Us</h2>
+                    <p>
+                        If you have any questions, contact us at:
+                        <br />
+                        <strong>digitalmedia875@gmail.com</strong>
+                    </p>
+                </section>
             </main>
+
 
             <Footer />
         </div>
