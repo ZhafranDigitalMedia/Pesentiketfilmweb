@@ -68,7 +68,9 @@ export default function Footer() {
           >
             Privacy Policy
           </p>
-          <p className="cursor-pointer text-white/80 hover:text-[#7EC8E3]">
+          <p className="cursor-pointer text-white/80 hover:text-[#7EC8E3]"
+            onClick={() => router.push("/Terms & Conditions")}
+          >
             Terms & Conditions
           </p>
           <p className="cursor-pointer text-white/80 hover:text-[#7EC8E3]">
