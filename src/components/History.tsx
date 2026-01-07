@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../utils/firebase";
+import { QRCodeCanvas } from "qrcode.react";
 
 interface Ticket {
   id: string;
@@ -55,17 +56,17 @@ export default function HistoryPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="min-h-screen flex items-center justify-center">
         Loading history...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-10">
+    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-10 bg-gradient-to-b from-[#6a65df] to-[#7451e1]">
       <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-5xl mx-auto">
         {/* TITLE */}
-        <h2 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mb-6 text-gray-800">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">
           🎫 Riwayat Tiket
         </h2>
 
@@ -78,8 +79,8 @@ export default function HistoryPage() {
         {tickets.map((t) => (
           <div
             key={t.id}
-            className="bg-gray-50 rounded-2xl shadow-md p-4 sm:p-6 mb-5
-                     flex flex-col lg:flex-row lg:items-center gap-6"
+            className="bg-gray-50 rounded-2xl shadow-md p-4 sm:p-6 mb-6
+                       flex flex-col lg:flex-row lg:items-center gap-6"
           >
             {/* LEFT */}
             <div className="flex-1">
@@ -111,26 +112,27 @@ export default function HistoryPage() {
               </p>
             </div>
 
-            {/* RIGHT */}
-            <div className="flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4">
-              <div className="text-green-600 font-semibold flex items-center gap-1">
+            {/* RIGHT (QR) */}
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-green-600 font-semibold flex items-center gap-1">
                 ✅ Paid
+              </span>
+
+              <div className="bg-white p-2 rounded-xl shadow">
+                <QRCodeCanvas
+                  value={`https://pesentiketfilmweb-3lcl.vercel.app/verify?ticketId=${t.id}`}
+                  size={110}
+                  level="H"
+                />
               </div>
 
-              <div
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl
-                         bg-gradient-to-br from-indigo-500 to-purple-500
-                         text-white flex flex-col items-center justify-center
-                         cursor-pointer"
-              >
-                <div className="text-3xl mb-1">▣</div>
-                <span className="text-xs">QR CODE</span>
-              </div>
+              <span className="text-xs text-gray-500">
+                Scan saat masuk bioskop
+              </span>
             </div>
           </div>
         ))}
       </div>
     </div>
   );
-
 }
