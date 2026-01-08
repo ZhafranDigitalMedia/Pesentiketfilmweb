@@ -61,7 +61,7 @@ export default function Footer() {
 
         {/* LEGAL */}
         <div className="space-y-3 text-sm">
-          <h4 className="font-semibold text-base mb-2">Legal</h4>
+          <h4 className="font-semibold text-base mb-2">informational</h4>
 
           <p className="cursor-pointer text-white/80 hover:text-[#7EC8E3]"
             onClick={() => router.push("/Privacy-Policy")}
