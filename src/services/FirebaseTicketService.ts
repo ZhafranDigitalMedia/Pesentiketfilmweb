@@ -11,8 +11,9 @@ import {
 } from "firebase/firestore";
 
 export class FirebaseTicketService extends TicketService {
+
   async book(ticket: Ticket): Promise<void> {
-    await addDoc(collection(db, "tickets"), {
+    await addDoc(collection(db, "history"), {
       userId: ticket.getUserId(),
       cinemaId: ticket.getCinemaId(),
       cinemaName: ticket.getCinemaName(),
@@ -20,7 +21,7 @@ export class FirebaseTicketService extends TicketService {
       schedule: ticket.getSchedule(),
       seat: ticket.getSeat(),
       price: ticket.getPrice(),
-      orderDate: Timestamp.now(),
+      createdAt: Timestamp.now(),
     });
   }
 
@@ -29,8 +30,9 @@ export class FirebaseTicketService extends TicketService {
     schedule: string,
     filmTitle: string
   ): Promise<string[]> {
+
     const q = query(
-      collection(db, "tickets"),
+      collection(db, "history"),
       where("cinemaId", "==", cinemaId),
       where("schedule", "==", schedule),
       where("filmTitle", "==", filmTitle)

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { auth, db } from "../utils/firebase";
+import { auth } from "../utils/firebase";
 import { QRCodeCanvas } from "qrcode.react";
+import { TicketHistoryController } from "../controllers/TicketHistoryController";
 
-interface Ticket {
+interface HistoryTicket {
   id: string;
   filmTitle: string;
   cinemaName: string;
@@ -16,7 +16,7 @@ interface Ticket {
 }
 
 export default function HistoryPage() {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [tickets, setTickets] = useState<HistoryTicket[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,28 +24,10 @@ export default function HistoryPage() {
       if (!user) return;
 
       try {
-        const q = query(
-          collection(db, "tickets"),
-          where("userId", "==", user.uid)
-        );
-
-        const snapshot = await getDocs(q);
-
-        const data: Ticket[] = snapshot.docs.map((doc) => {
-          const d = doc.data();
-          return {
-            id: doc.id,
-            filmTitle: d.filmTitle,
-            cinemaName: d.cinemaName,
-            schedule: d.schedule,
-            seat: d.seat,
-            price: d.price,
-          };
-        });
-
+        const data = await TicketHistoryController.getHistory(user.uid);
         setTickets(data);
       } catch (err) {
-        console.error(err);
+        console.error("Gagal ambil history:", err);
       } finally {
         setLoading(false);
       }
@@ -63,11 +45,12 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-10 bg-gradient-to-b from-[#6a65df] to-[#7451e1]">
+    <div className="min-h-screen px-4 sm:px-6 py-6 sm:py-10
+                    bg-gradient-to-b from-[#6a65df] to-[#7451e1]">
       <div className="bg-white rounded-3xl p-5 sm:p-8 max-w-5xl mx-auto">
-        {/* TITLE */}
+
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800">
-          🎫 Riwayat Tiket
+          🎫 History
         </h2>
 
         {tickets.length === 0 && (
@@ -112,15 +95,15 @@ export default function HistoryPage() {
               </p>
             </div>
 
-            {/* RIGHT (QR) */}
+            {/* RIGHT */}
             <div className="flex flex-col items-center gap-2">
-              <span className="text-green-600 font-semibold flex items-center gap-1">
+              <span className="text-green-600 font-semibold">
                 ✅ Paid
               </span>
 
               <div className="bg-white p-2 rounded-xl shadow">
                 <QRCodeCanvas
-                  value={`https://pesentiketfilmweb-3lcl.vercel.app/verify?ticketId=${t.id}`}
+                  value={`TICKET-${t.id}`}
                   size={110}
                   level="H"
                 />

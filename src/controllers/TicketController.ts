@@ -4,7 +4,7 @@ import { FirebaseTicketService } from "../services/FirebaseTicketService";
 export class TicketController {
   private static service = new FirebaseTicketService();
 
-  static async bookTicket(ticket: Ticket): Promise<void> {
+  static async book(ticket: Ticket): Promise<void> {
     await this.service.book(ticket);
   }
 

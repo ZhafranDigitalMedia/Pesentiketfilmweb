@@ -3,13 +3,24 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../../utils/firebase";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 
+import { auth, db } from "../../../utils/firebase";
 import { Ticket } from "../../../models/Ticket";
-import { Cinema } from "../../../models/Cinema";
-
 import { TicketController } from "../../../controllers/TicketController";
-import { CinemaController } from "../../../controllers/CinemaController";
+
+interface Cinema {
+  id: string;
+  name: string;
+  price: number;
+  location: string;
+}
 
 const times = ["12:00 WIB", "15:00 WIB", "18:00 WIB", "21:00 WIB"];
 const rows = ["A", "B", "C", "D", "E", "F"];
@@ -19,7 +30,6 @@ export default function BookingPage() {
   const router = useRouter();
 
   const [userId, setUserId] = useState<string | null>(null);
-
   const [cinemaList, setCinemaList] = useState<Cinema[]>([]);
   const [loadingCinema, setLoadingCinema] = useState(true);
 
@@ -36,7 +46,7 @@ export default function BookingPage() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (!user) {
-        router.push("/login");
+        router.replace("/login");
         return;
       }
       setUserId(user.uid);
@@ -46,7 +56,7 @@ export default function BookingPage() {
   }, [router]);
 
   // ======================
-  // MOVIE TITLE (QUERY)
+  // MOVIE TITLE
   // ======================
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -54,21 +64,22 @@ export default function BookingPage() {
   }, []);
 
   // ======================
-  // FETCH CINEMA (REALTIME VIA FIRESTORE SERVICE)
+  // FETCH CINEMA (REALTIME)
   // ======================
   useEffect(() => {
-    const fetchCinema = async () => {
-      try {
-        const cinemas = await CinemaController.getCinemas();
-        setCinemaList(cinemas);
-      } catch (err) {
-        console.error("Gagal mengambil cinema", err);
-      } finally {
-        setLoadingCinema(false);
-      }
-    };
+    const q = collection(db, "cinemas");
 
-    fetchCinema();
+    const unsub = onSnapshot(q, (snap) => {
+      const data = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Omit<Cinema, "id">),
+      }));
+
+      setCinemaList(data);
+      setLoadingCinema(false);
+    });
+
+    return () => unsub();
   }, []);
 
   // ======================
@@ -82,7 +93,7 @@ export default function BookingPage() {
       }
 
       const seats = await TicketController.getBookedSeats(
-        selectedCinema.getId(),
+        selectedCinema.id,
         selectedTime,
         movieTitle
       );
@@ -94,7 +105,7 @@ export default function BookingPage() {
   }, [selectedCinema, selectedTime, movieTitle]);
 
   // ======================
-  // BOOKING
+  // BOOK TICKET
   // ======================
   const handleBooking = async () => {
     if (!userId || !selectedCinema || !selectedTime || !selectedSeat) {
@@ -109,15 +120,15 @@ export default function BookingPage() {
 
     const ticket = new Ticket(
       userId,
-      selectedCinema.getId(),
-      selectedCinema.getName(),
+      selectedCinema.id,
+      selectedCinema.name,
       movieTitle,
       selectedTime,
       selectedSeat,
-      selectedCinema.getPrice()
+      selectedCinema.price
     );
 
-    await TicketController.bookTicket(ticket);
+    await TicketController.book(ticket);
     router.push("/history");
   };
 
@@ -141,25 +152,20 @@ export default function BookingPage() {
           <div className="flex flex-col gap-3">
             {cinemaList.map((cinema) => (
               <button
-                key={cinema.getId()}
+                key={cinema.id}
                 onClick={() => {
                   setSelectedCinema(cinema);
                   setSelectedSeat("");
                 }}
                 className={`p-4 border rounded-xl text-left
-                  ${selectedCinema?.getId() === cinema.getId()
+                  ${selectedCinema?.id === cinema.id
                     ? "border-purple-500 bg-purple-100"
                     : "border-gray-300"
                   }`}
               >
-                <p className="font-semibold text-black">
-                  {cinema.getName()}
-                </p>
+                <p className="font-semibold text-black">{cinema.name}</p>
                 <p className="text-sm text-gray-500">
-                  Rp {cinema.getPrice().toLocaleString()}
-                </p>
-                <p className="text-xs text-gray-400">
-                  {cinema.getLocation()}
+                  Rp {cinema.price.toLocaleString("id-ID")}
                 </p>
               </button>
             ))}
@@ -171,7 +177,7 @@ export default function BookingPage() {
           Jadwal Tayang
         </h2>
 
-        <div className="flex gap-3 flex-wrap text-black">
+        <div className="flex gap-3 flex-wrap">
           {times.map((t) => (
             <button
               key={t}
@@ -181,8 +187,8 @@ export default function BookingPage() {
               }}
               className={`px-6 py-2 rounded-xl border
                 ${selectedTime === t
-                  ? "bg-blue-700 border-blue-700 text-white"
-                  : "border-gray-700"
+                  ? "bg-blue-700 text-white border-blue-700"
+                  : "border-gray-400 text-black"
                 }`}
             >
               {t}
@@ -195,7 +201,7 @@ export default function BookingPage() {
           Pilih Kursi
         </h2>
 
-        <div className="bg-gray-500 text-center py-2 rounded-lg font-semibold mb-6 text-white">
+        <div className="bg-gray-500 text-white text-center py-2 rounded-lg font-semibold mb-6">
           LAYAR
         </div>
 
@@ -233,11 +239,11 @@ export default function BookingPage() {
         {/* SUBMIT */}
         <button
           onClick={handleBooking}
-          className="mt-8 w-full bg-purple-600 text-white p-3 rounded-xl font-bold"
+          className="mt-8 w-full bg-purple-600 hover:bg-purple-700
+                     text-white p-3 rounded-xl font-bold"
         >
           Pesan Tiket
         </button>
-
       </div>
     </div>
   );
