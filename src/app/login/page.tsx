@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import logo from "../../assets/logo.png";
 import { AuthController } from "../../controllers/AuthController";
 import { AuthException } from "../../exceptions/AuthException";
-import logo from "../../assets/logo.png";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,8 +21,10 @@ export default function LoginPage() {
 
     try {
       await AuthController.login(email, password);
-      alert("Login berhasil");
-      // router.push("/") ← kalau mau redirect
+
+      // ✅ REDIRECT KE HOME
+      router.push("/");
+
     } catch (err) {
       if (err instanceof AuthException) {
         setError(err.message);
@@ -34,8 +39,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
       <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-xl">
+
         <div className="flex flex-col items-center mb-6">
-          <img src={logo.src} className="w-12 mb-2" alt="logo" />
+          <img src="/logo.png" className="w-12 mb-2" alt="logo" />
           <h1 className="text-3xl font-bold text-indigo-600">CineBook</h1>
         </div>
 
@@ -58,9 +64,7 @@ export default function LoginPage() {
             className="px-4 py-2 border rounded-lg text-black"
           />
 
-          {error && (
-            <p className="text-red-600 text-center">{error}</p>
-          )}
+          {error && <p className="text-red-600 text-center">{error}</p>}
 
           <button
             type="submit"
@@ -70,13 +74,6 @@ export default function LoginPage() {
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
-
-        <p className="text-center mt-4 text-sm">
-          Belum punya akun?{" "}
-          <a href="/register" className="font-semibold text-indigo-600">
-            Register
-          </a>
-        </p>
       </div>
     </div>
   );
