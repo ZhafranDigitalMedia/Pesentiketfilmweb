@@ -6,14 +6,10 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../utils/firebase";
 
 import { Ticket } from "../../../models/Ticket";
-import { TicketController } from "../../../controllers/TicketController";
+import { Cinema } from "../../../models/Cinema";
 
-interface Cinema {
-  id: string;
-  name: string;
-  price: number;
-  location: string;
-}
+import { TicketController } from "../../../controllers/TicketController";
+import { CinemaController } from "../../../controllers/CinemaController";
 
 const times = ["12:00 WIB", "15:00 WIB", "18:00 WIB", "21:00 WIB"];
 const rows = ["A", "B", "C", "D", "E", "F"];
@@ -23,6 +19,7 @@ export default function BookingPage() {
   const router = useRouter();
 
   const [userId, setUserId] = useState<string | null>(null);
+
   const [cinemaList, setCinemaList] = useState<Cinema[]>([]);
   const [loadingCinema, setLoadingCinema] = useState(true);
 
@@ -49,7 +46,7 @@ export default function BookingPage() {
   }, [router]);
 
   // ======================
-  // MOVIE TITLE FROM QUERY
+  // MOVIE TITLE (QUERY)
   // ======================
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -57,15 +54,21 @@ export default function BookingPage() {
   }, []);
 
   // ======================
-  // FETCH CINEMA (STATIC / FIRESTORE VIA SERVICE BISA DITAMBAH)
+  // FETCH CINEMA (REALTIME VIA FIRESTORE SERVICE)
   // ======================
   useEffect(() => {
-    // sementara statis (boleh kalau dosen tidak menuntut cinema OOP)
-    setCinemaList([
-      { id: "C1", name: "Cinema XXI", price: 50000, location: "Mall A" },
-      { id: "C2", name: "CGV", price: 45000, location: "Mall B" },
-    ]);
-    setLoadingCinema(false);
+    const fetchCinema = async () => {
+      try {
+        const cinemas = await CinemaController.getCinemas();
+        setCinemaList(cinemas);
+      } catch (err) {
+        console.error("Gagal mengambil cinema", err);
+      } finally {
+        setLoadingCinema(false);
+      }
+    };
+
+    fetchCinema();
   }, []);
 
   // ======================
@@ -79,7 +82,7 @@ export default function BookingPage() {
       }
 
       const seats = await TicketController.getBookedSeats(
-        selectedCinema.id,
+        selectedCinema.getId(),
         selectedTime,
         movieTitle
       );
@@ -106,12 +109,12 @@ export default function BookingPage() {
 
     const ticket = new Ticket(
       userId,
-      selectedCinema.id,
-      selectedCinema.name,
+      selectedCinema.getId(),
+      selectedCinema.getName(),
       movieTitle,
       selectedTime,
       selectedSeat,
-      selectedCinema.price
+      selectedCinema.getPrice()
     );
 
     await TicketController.bookTicket(ticket);
@@ -128,27 +131,35 @@ export default function BookingPage() {
         <p className="text-gray-500 mb-6">Booking tiket film</p>
 
         {/* CINEMA */}
-        <h2 className="font-semibold text-lg mb-2 text-black">Pilih Cinema</h2>
+        <h2 className="font-semibold text-lg mb-2 text-black">
+          Pilih Cinema
+        </h2>
+
         {loadingCinema ? (
           <p>Loading...</p>
         ) : (
           <div className="flex flex-col gap-3">
             {cinemaList.map((cinema) => (
               <button
-                key={cinema.id}
+                key={cinema.getId()}
                 onClick={() => {
                   setSelectedCinema(cinema);
                   setSelectedSeat("");
                 }}
                 className={`p-4 border rounded-xl text-left
-                  ${selectedCinema?.id === cinema.id
+                  ${selectedCinema?.getId() === cinema.getId()
                     ? "border-purple-500 bg-purple-100"
                     : "border-gray-300"
                   }`}
               >
-                <p className="font-semibold text-black">{cinema.name}</p>
+                <p className="font-semibold text-black">
+                  {cinema.getName()}
+                </p>
                 <p className="text-sm text-gray-500">
-                  Rp {cinema.price.toLocaleString()}
+                  Rp {cinema.getPrice().toLocaleString()}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {cinema.getLocation()}
                 </p>
               </button>
             ))}
@@ -159,6 +170,7 @@ export default function BookingPage() {
         <h2 className="font-semibold text-lg mt-6 mb-2 text-black">
           Jadwal Tayang
         </h2>
+
         <div className="flex gap-3 flex-wrap text-black">
           {times.map((t) => (
             <button
@@ -225,6 +237,7 @@ export default function BookingPage() {
         >
           Pesan Tiket
         </button>
+
       </div>
     </div>
   );
