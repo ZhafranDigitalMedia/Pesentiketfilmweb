@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AuthController } from "../../controllers/AuthController";
 import { AuthException } from "../../exceptions/AuthException";
-import logo from "@/assets/logo.png";
+import logo from "../../assets/logo.png";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
