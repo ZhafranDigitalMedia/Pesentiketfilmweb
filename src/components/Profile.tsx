@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProfileController } from "@/controllers/ProfileController";
-import { UserProfile } from "@/models/UserProfile";
+import { ProfileController } from "../controllers/ProfileController";
+import { UserProfile } from "../models/UserProfile";
 
 export default function Profile() {
   const router = useRouter();
