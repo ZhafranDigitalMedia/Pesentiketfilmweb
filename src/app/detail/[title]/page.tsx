@@ -2,17 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  where,
-  Timestamp,
-  onSnapshot,
-} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../../../utils/firebase";
+import { auth } from "../../../utils/firebase";
+
+import { Ticket } from "../../../models/Ticket";
+import { TicketController } from "../../../controllers/TicketController";
 
 interface Cinema {
   id: string;
@@ -40,7 +34,7 @@ export default function BookingPage() {
   const [bookedSeats, setBookedSeats] = useState<string[]>([]);
 
   // ======================
-  // AUTH
+  // AUTH CHECK
   // ======================
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
@@ -55,7 +49,7 @@ export default function BookingPage() {
   }, [router]);
 
   // ======================
-  // MOVIE TITLE
+  // MOVIE TITLE FROM QUERY
   // ======================
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -63,46 +57,37 @@ export default function BookingPage() {
   }, []);
 
   // ======================
-  // FETCH CINEMA
+  // FETCH CINEMA (STATIC / FIRESTORE VIA SERVICE BISA DITAMBAH)
   // ======================
   useEffect(() => {
-    const fetchCinema = async () => {
-      const snap = await getDocs(collection(db, "cinemas"));
-      const data = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Cinema, "id">),
-      }));
-      setCinemaList(data);
-      setLoadingCinema(false);
-    };
-
-    fetchCinema();
+    // sementara statis (boleh kalau dosen tidak menuntut cinema OOP)
+    setCinemaList([
+      { id: "C1", name: "Cinema XXI", price: 50000, location: "Mall A" },
+      { id: "C2", name: "CGV", price: 45000, location: "Mall B" },
+    ]);
+    setLoadingCinema(false);
   }, []);
 
   // ======================
-  // REALTIME BOOKED SEATS
+  // FETCH BOOKED SEATS
   // ======================
   useEffect(() => {
-    if (!selectedCinema || !selectedTime || !movieTitle) {
-      setBookedSeats([]);
-      return;
-    }
+    const fetchSeats = async () => {
+      if (!selectedCinema || !selectedTime || !movieTitle) {
+        setBookedSeats([]);
+        return;
+      }
 
-    const q = query(
-      collection(db, "tickets"),
-      where("cinemaId", "==", selectedCinema.id),
-      where("schedule", "==", selectedTime),
-      where("filmTitle", "==", movieTitle)
-    );
-
-    const unsub = onSnapshot(q, (snapshot) => {
-      const seats = snapshot.docs.map(
-        (doc) => doc.data().seat as string
+      const seats = await TicketController.getBookedSeats(
+        selectedCinema.id,
+        selectedTime,
+        movieTitle
       );
-      setBookedSeats(seats);
-    });
 
-    return () => unsub();
+      setBookedSeats(seats);
+    };
+
+    fetchSeats();
   }, [selectedCinema, selectedTime, movieTitle]);
 
   // ======================
@@ -114,23 +99,22 @@ export default function BookingPage() {
       return;
     }
 
-    // 🔒 DOUBLE CHECK (ANTI TABRUK)
     if (bookedSeats.includes(selectedSeat)) {
       alert("Kursi sudah terisi!");
       return;
     }
 
-    await addDoc(collection(db, "tickets"), {
+    const ticket = new Ticket(
       userId,
-      cinemaId: selectedCinema.id,
-      cinemaName: selectedCinema.name,
-      filmTitle: movieTitle,
-      schedule: selectedTime,
-      seat: selectedSeat,
-      price: selectedCinema.price,
-      orderDate: Timestamp.now(),
-    });
+      selectedCinema.id,
+      selectedCinema.name,
+      movieTitle,
+      selectedTime,
+      selectedSeat,
+      selectedCinema.price
+    );
 
+    await TicketController.bookTicket(ticket);
     router.push("/history");
   };
 
@@ -185,7 +169,7 @@ export default function BookingPage() {
               }}
               className={`px-6 py-2 rounded-xl border
                 ${selectedTime === t
-                  ? "bg-blue-700 border-blue-700"
+                  ? "bg-blue-700 border-blue-700 text-white"
                   : "border-gray-700"
                 }`}
             >
@@ -199,7 +183,7 @@ export default function BookingPage() {
           Pilih Kursi
         </h2>
 
-        <div className="bg-gray-500 text-center py-2 rounded-lg font-semibold mb-6">
+        <div className="bg-gray-500 text-center py-2 rounded-lg font-semibold mb-6 text-white">
           LAYAR
         </div>
 
