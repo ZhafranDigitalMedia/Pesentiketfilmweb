@@ -1,83 +1,66 @@
 "use client";
 
-import Image from "next/image";
-import logo from "../../assets/cinebook-logo.png";
-
-import HeaderNav from "../../components/HeaderNav";
-import AdminHeaderNav from "../../components/adminHeaderNav";
-import Profile from "../../components/Profile";
-import Footer from "../../components/Footer";
-
 import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../utils/firebase";
+import { useRouter } from "next/navigation";
+import { ProfileController } from "../../controllers/ProfileController";
+import { UserProfile } from "../../models/UserProfile";
 
-export default function ProfilePage() {
-  const [role, setRole] = useState<string | null>(null);
+export default function Profile() {
+  const router = useRouter();
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // ============================
-  // GET ROLE FROM FIREBASE
-  // ============================
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+    ProfileController.loadProfile()
+      .then(setUser)
+      .catch(() => router.replace("/login"))
+      .finally(() => setLoading(false));
+  }, [router]);
 
-      try {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists()) {
-          setRole(snap.data().role);
-        }
-      } catch (err) {
-        console.error("Gagal ambil role:", err);
-      } finally {
-        setLoading(false);
-      }
-    });
-
-    return () => unsub();
-  }, []);
-
-  if (loading) return null;
+  if (loading || !user) {
+    return <p style={{ color: "white", padding: "50px" }}>Loading profile...</p>;
+  }
 
   return (
-    <div style={{ background: "#6A77E0", minHeight: "100vh" }}>
-      {/* HEADER LOGO */}
-      <header
-        style={{
-          padding: "15px 25px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        <Image src={logo} alt="CineBook logo" width={100} height={100} />
-        <h1
-          style={{
-            fontSize: "40px",
-            fontWeight: 700,
-            color: "white",
-            margin: 0,
+    <div className="min-h-screen bg-[#6A77E0] px-4 py-6">
+      <div className="bg-white rounded-3xl p-8 max-w-4xl mx-auto shadow-xl">
+
+        <h2 className="text-3xl font-bold mb-6">Profile</h2>
+
+        <div className="text-center mb-6">
+          <h3 className="text-xl font-semibold">{user.getName()}</h3>
+          <p>{user.getEmail()}</p>
+          <p>{user.getPhone()}</p>
+          <p>Role: {user.getRole()}</p>
+        </div>
+
+        {user.getRole() !== "admin" && (
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <StatCard icon="🎟️" value={user.getTotalTicket()} label="Tiket Dibeli" />
+            <StatCard icon="❤️" value={user.getTotalFavorite()} label="Film Favorit" />
+          </div>
+        )}
+
+        <button
+          onClick={async () => {
+            await ProfileController.logout();
+            router.replace("/login");
           }}
+          className="w-full py-3 rounded-xl bg-red-500 text-white font-semibold"
         >
-          CineBook
-        </h1>
-      </header>
-
-      {/* NAVBAR */}
-      <div>
-        {role === "admin" ? <AdminHeaderNav /> : <HeaderNav />}
+          Logout
+        </button>
       </div>
-
-      {/* PROFILE CONTENT */}
-      <Profile />
-      <Footer />
     </div>
   );
+}
 
+function StatCard({ icon, value, label }: any) {
+  return (
+    <div className="bg-gray-50 rounded-2xl p-4 text-center">
+      <div className="text-2xl">{icon}</div>
+      <div className="text-xl font-bold">{value}</div>
+      <div className="text-sm text-gray-500">{label}</div>
+    </div>
+  );
 }

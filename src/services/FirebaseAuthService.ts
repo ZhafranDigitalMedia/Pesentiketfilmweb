@@ -17,9 +17,5 @@ export class FirebaseAuthService extends AuthService {
       user.getEmail(),
       password
     );
-
-    // NOTE:
-    // nama & no_telpon bisa disimpan ke Firestore
-    // (tidak wajib untuk rubrik PBO)
   }
 }
