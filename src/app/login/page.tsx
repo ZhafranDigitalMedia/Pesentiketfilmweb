@@ -1,59 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../../utils/firebase";
-import logo from "../../assets/logo.png";
+import { useState } from "react";
+import { AuthController } from "../../controllers/AuthController";
+import { AuthException } from "../../exceptions/AuthException";
+import logo from "@/assets/logo.png";
 
 export default function LoginPage() {
-  const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔑 AUTO REDIRECT JIKA SUDAH LOGIN
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.replace("/");
-      }
-    });
-    return () => unsub();
-  }, [router]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      const user = userCredential.user;
-
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        throw new Error("Data user tidak ditemukan");
+      await AuthController.login(email, password);
+      alert("Login berhasil");
+      // router.push("/") ← kalau mau redirect
+    } catch (err) {
+      if (err instanceof AuthException) {
+        setError(err.message);
+      } else {
+        setError("Terjadi kesalahan");
       }
-
-      const userData = userSnap.data();
-
-      localStorage.setItem("role", userData.role ?? "user");
-      localStorage.setItem("user", JSON.stringify(userData));
-      // ❌ JANGAN router.replace di sini
-
-    } catch (err: any) {
-      setError("Email atau password salah");
     } finally {
       setLoading(false);
     }
@@ -86,7 +58,9 @@ export default function LoginPage() {
             className="px-4 py-2 border rounded-lg text-black"
           />
 
-          {error && <p className="text-red-600 text-center">{error}</p>}
+          {error && (
+            <p className="text-red-600 text-center">{error}</p>
+          )}
 
           <button
             type="submit"
@@ -96,7 +70,8 @@ export default function LoginPage() {
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
-         <p className="text-center mt-4 text-sm">
+
+        <p className="text-center mt-4 text-sm">
           Belum punya akun?{" "}
           <a href="/register" className="font-semibold text-indigo-600">
             Register

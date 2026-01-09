@@ -3,10 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import logo from "../../assets/logo.png";
-
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../utils/firebase";
+import { AuthController } from "../../controllers/AuthController";
+import { AuthException } from "../../exceptions/AuthException";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,45 +20,24 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError("");
 
-    // 🔒 validasi password
-    if (password !== confirmPassword) {
-      setError("Password dan konfirmasi password tidak sama!");
-      return;
-    }
-
     try {
-      setLoading(true);
-
-      // 1️⃣ BUAT AKUN DI FIREBASE AUTH
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      await AuthController.register(
+        name,
+        notelp,
         email,
-        password
+        password,
+        confirmPassword
       );
 
-      const user = userCredential.user;
-
-      // 2️⃣ SIMPAN DATA TAMBAHAN DI FIRESTORE
-      await setDoc(doc(db, "users", user.uid), {
-        name: name,
-        email: email,
-        no_telp: notelp,
-        role: "user",
-        createdAt: new Date(),
-      });
-
-      // 3️⃣ REDIRECT
       router.push("/login");
-
-    } catch (err: any) {
-      if (err.code === "auth/email-already-in-use") {
-        setError("Email sudah terdaftar");
-      } else if (err.code === "auth/weak-password") {
-        setError("Password minimal 6 karakter");
+    } catch (err) {
+      if (err instanceof AuthException) {
+        setError(err.message);
       } else {
-        setError("Registrasi gagal");
+        setError("Terjadi kesalahan");
       }
     } finally {
       setLoading(false);
@@ -71,7 +48,6 @@ export default function RegisterPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 p-4">
       <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-xl">
 
-        {/* Logo */}
         <div className="flex flex-col items-center mb-6">
           <img src={logo.src} className="w-12 mb-2" alt="logo" />
           <h1 className="text-3xl font-bold text-indigo-600">CineBook</h1>
@@ -79,78 +55,63 @@ export default function RegisterPage() {
 
         <form onSubmit={handleRegister} className="flex flex-col gap-4">
 
-          <div>
-            <label className="text-black">Nama lengkap</label>
-            <input
-              type="Nama"
-              placeholder="Nama Lengkap"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          <input
+            placeholder="Nama Lengkap"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
 
-          <div>
-            <label className="text-black">Email</label>
-            <input
-              type="Email"
-              placeholder="Email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          <input
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
 
-          <div className="relative">
-            <label className="text-black">Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
 
-          <div className="relative">
-            <label className="text-black">Konfirmasi Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Konfirmasi Password"
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-8.75 cursor-pointer text-gray-600 text-lg"
-            >
-              {showPassword ? "🙈" : "👁️"}
-            </span>
-          </div>
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Konfirmasi Password"
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
 
-          <div>
-            <label className="text-black">No Telepon</label>
-            <input
-              type="text"
-              placeholder="No Telepon"
-              required
-              value={notelp}
-              onChange={(e) => setNotelp(e.target.value)}
-              className="w-full mt-1 px-4 py-2 border rounded-lg text-black"
-            />
-          </div>
+          <span
+            onClick={() => setShowPassword(!showPassword)}
+            className="cursor-pointer text-sm text-gray-600"
+          >
+            {showPassword ? "🙈 Sembunyikan" : "👁️ Tampilkan"} password
+          </span>
 
-          {error && <p className="text-red-600 text-center text-sm">{error}</p>}
+          <input
+            placeholder="No Telepon"
+            required
+            value={notelp}
+            onChange={(e) => setNotelp(e.target.value)}
+            className="px-4 py-2 border rounded-lg text-black"
+          />
+
+          {error && (
+            <p className="text-red-600 text-center text-sm">{error}</p>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 bg-indigo-500 hover:bg-indigo-600 text-white py-2 rounded-lg font-semibold"
+            className="bg-indigo-500 text-white py-2 rounded-lg font-semibold"
           >
             {loading ? "Loading..." : "Register"}
           </button>
@@ -158,9 +119,10 @@ export default function RegisterPage() {
 
         <p className="text-center mt-4 text-sm">
           Sudah punya akun?{" "}
-          <a href="/login" className="font-semibold text-indigo-600">Login</a>
+          <a href="/login" className="font-semibold text-indigo-600">
+            Login
+          </a>
         </p>
-
       </div>
     </div>
   );
