@@ -25,9 +25,14 @@ export default function Profile() {
     <div className="min-h-screen bg-[#6A77E0] px-4 py-6">
       <div className="bg-white rounded-3xl p-8 max-w-4xl mx-auto shadow-xl">
 
-        <h2 className="text-3xl font-bold mb-6">Profile</h2>
+        <h2 className="text-3xl font-bold mb-6 text-black">Profile</h2>
 
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 text-black">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full
+                        bg-white/30 flex items-center justify-center
+                        text-3xl sm:text-4xl mx-auto mb-4">
+            👤
+          </div>
           <h3 className="text-xl font-semibold">{user.getName()}</h3>
           <p>{user.getEmail()}</p>
           <p>{user.getPhone()}</p>
