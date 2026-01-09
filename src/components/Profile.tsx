@@ -27,16 +27,23 @@ export default function Profile() {
 
         <h2 className="text-3xl font-bold mb-6 text-black">Profile</h2>
 
-        <div className="text-center mb-6 text-black">
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-500
+                      rounded-3xl p-6 sm:p-8 text-white text-center
+                      max-w-md mx-auto mb-8">
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full
                         bg-white/30 flex items-center justify-center
                         text-3xl sm:text-4xl mx-auto mb-4">
             👤
           </div>
-          <h3 className="text-xl font-semibold">{user.getName()}</h3>
-          <p>{user.getEmail()}</p>
-          <p>{user.getPhone()}</p>
-          <p>Role: {user.getRole()}</p>
+
+          <h3 className="text-lg sm:text-xl font-semibold">
+            {user.getName()}
+          </h3>
+          <p className="text-sm sm:text-base mt-1">✉️ {user.getEmail()}</p>
+          <p className="text-sm sm:text-base">📞 {user.getPhone()}</p>
+          <p className="text-sm sm:text-base mt-2">
+            Role: <span className="font-semibold capitalize">{user.getRole()}</span>
+          </p>
         </div>
 
         {user.getRole() !== "admin" && (
@@ -60,11 +67,19 @@ export default function Profile() {
   );
 }
 
-function StatCard({ icon, value, label }: any) {
+function StatCard({
+  icon,
+  value,
+  label,
+}: {
+  icon: string;
+  value: number;
+  label: string;
+}) {
   return (
-    <div className="bg-gray-50 rounded-2xl p-4 text-center">
-      <div className="text-2xl">{icon}</div>
-      <div className="text-xl font-bold">{value}</div>
+    <div className="bg-gray-50 rounded-2xl p-4 text-center shadow-sm">
+      <div className="text-2xl mb-1">{icon}</div>
+      <div className="text-xl font-bold text-gray-800">{value}</div>
       <div className="text-sm text-gray-500">{label}</div>
     </div>
   );
