@@ -103,7 +103,7 @@ export default function HistoryPage() {
 
               <div className="bg-white p-2 rounded-xl shadow">
                 <QRCodeCanvas
-                  value={`TICKET-${t.id}`}
+                  value={`https://pesentiketfilmweb-3lcl.vercel.app/verify?ticketId=${t.id}`}
                   size={110}
                   level="H"
                 />
