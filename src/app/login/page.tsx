@@ -41,7 +41,7 @@ export default function LoginPage() {
       <div className="bg-white w-full max-w-md p-10 rounded-2xl shadow-xl">
 
         <div className="flex flex-col items-center mb-6">
-          <img src="/logo.png" className="w-12 mb-2" alt="logo" />
+          <img src={logo.src} className="w-12 mb-2" alt="logo" />
           <h1 className="text-3xl font-bold text-indigo-600">CineBook</h1>
         </div>
 
@@ -74,6 +74,12 @@ export default function LoginPage() {
             {loading ? "Loading..." : "Login"}
           </button>
         </form>
+        <p className="text-center mt-4 text-sm">
+          Belum punya akun?{" "}
+          <a href="/register" className="font-semibold text-indigo-600">
+            Register
+          </a>
+        </p>
       </div>
     </div>
   );
